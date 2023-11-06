@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { InferSchemaType, Schema } from "mongoose";
 
 if (process.env.MONGODB_URI) {
   mongoose.connect(process.env.MONGODB_URI);
@@ -8,7 +8,7 @@ if (process.env.MONGODB_URI) {
 
 mongoose.Promise = global.Promise;
 
-const tabSchema = new Schema(
+const docSchema = new Schema(
   {
     title: String,
     tags: [String],
@@ -18,5 +18,7 @@ const tabSchema = new Schema(
   },
 );
 
-const Tab = mongoose.models.Tab || mongoose.model("Tab", tabSchema);
-export default Tab;
+type DocType = InferSchemaType<typeof docSchema>;
+
+const Doc = mongoose.models.Doc || mongoose.model<DocType>("Doc", docSchema);
+export default Doc;
