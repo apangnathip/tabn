@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType, Schema } from "mongoose";
+import mongoose, { InferSchemaType, Schema, Types } from "mongoose";
 
 if (process.env.MONGODB_URI) {
   mongoose.connect(process.env.MONGODB_URI);
@@ -10,6 +10,7 @@ mongoose.Promise = global.Promise;
 
 const docSchema = new Schema(
   {
+    _id: Types.ObjectId,
     title: String,
     tags: [String],
   },
@@ -18,7 +19,7 @@ const docSchema = new Schema(
   },
 );
 
-type DocType = InferSchemaType<typeof docSchema>;
+export type DocType = InferSchemaType<typeof docSchema>;
 
 const Doc = mongoose.models.Doc || mongoose.model<DocType>("Doc", docSchema);
 export default Doc;
