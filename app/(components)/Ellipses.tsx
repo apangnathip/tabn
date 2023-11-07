@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { Types } from "mongoose";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import DropdownMenu from "./DropdownMenu";
 import DropdownPrompts from "./DropdownPrompts";
 
-const Ellipses = () => {
+const Ellipses = ({ id }: { id: Types.ObjectId }) => {
   const [active, setActive] = useState(false);
   const [activePrompts, setActivePrompts] = useState({
     rename: false,
@@ -27,6 +28,7 @@ const Ellipses = () => {
         />
       )}
       <DropdownPrompts
+        id={id}
         activePrompts={activePrompts}
         setActivePrompts={setActivePrompts}
       />
