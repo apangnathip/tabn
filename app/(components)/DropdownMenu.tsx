@@ -1,11 +1,10 @@
-import React, { SetStateAction, useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowUpRightFromSquare,
   faFont,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
-import Prompt from "./Prompt";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { SetStateAction, useEffect } from "react";
 
 const DropdownItem = ({
   set,
