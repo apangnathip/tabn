@@ -3,9 +3,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import DropdownMenu from "./DropdownMenu";
+import DropdownPrompts from "./DropdownPrompts";
 
 const Ellipses = () => {
   const [active, setActive] = useState(false);
+  const [activePrompts, setActivePrompts] = useState({
+    rename: false,
+    remove: false,
+  });
+
   return (
     <div className="relative">
       <button
@@ -14,7 +20,16 @@ const Ellipses = () => {
       >
         <FontAwesomeIcon icon={faEllipsisVertical} size="lg" />
       </button>
-      {active && <DropdownMenu setActive={setActive} />}
+      {active && (
+        <DropdownMenu
+          setActive={setActive}
+          setActivePrompts={setActivePrompts}
+        />
+      )}
+      <DropdownPrompts
+        activePrompts={activePrompts}
+        setActivePrompts={setActivePrompts}
+      />
     </div>
   );
 };
