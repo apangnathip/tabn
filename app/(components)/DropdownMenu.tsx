@@ -18,14 +18,13 @@ const DropdownItem = ({
 }) => {
   return (
     <div>
-      <a
-        href="#"
+      <span
         className="flex gap-2 px-2 py-1 text-base hover:bg-gray-300 active:bg-gray-400"
         onClick={() => set(true)}
       >
         <span>{icon}</span>
         {children}
-      </a>
+      </span>
     </div>
   );
 };
