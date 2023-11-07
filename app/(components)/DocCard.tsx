@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Ellipses from "./Ellipses";
 import { DocType } from "../(models)/Doc";
 
@@ -12,7 +11,7 @@ export const DocCard = ({ doc }: { doc: DocType }) => {
         <p className="text-base font-medium">{doc.title}</p>
         <div className="flex items-center justify-between text-xs ">
           <span>Updated {doc.updatedAt.toString().slice(0, 10)}</span>
-          <Ellipses id={doc._id} />
+          <Ellipses doc={doc} />
         </div>
       </div>
     </div>
