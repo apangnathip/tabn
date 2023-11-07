@@ -11,9 +11,9 @@ export type DocCardProps = {
 
 export const DocCard = ({ title, createdAt, updatedAt }: DocCardProps) => {
   return (
-    <div className="w-48 ">
+    <div className="w-48">
       <div className="bg-gray-500 rounded-t w-48 letter"></div>
-      <div className="bg-gray-300 rounded-b p-4">
+      <div className="bg-gray-300 rounded-b h-20 p-4">
         <p className="text-base font-medium">{title}</p>
         <div className="flex justify-between items-center text-xs ">
           <span>Updated {updatedAt.slice(0, 10)}</span>
