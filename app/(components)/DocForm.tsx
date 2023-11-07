@@ -26,7 +26,7 @@ const DocForm = () => {
 
   return (
     <button
-      className="w-48 h-80 border-2 border-black rounded text-5xl bg-gray-50 hover:bg-gray-200 active:bg-blue-100"
+      className="h-80 w-48 rounded border-2 border-black bg-gray-50 text-5xl hover:bg-gray-200 active:bg-blue-100"
       onClick={createDoc}
     >
       +

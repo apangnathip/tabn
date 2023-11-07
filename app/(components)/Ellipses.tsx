@@ -9,7 +9,7 @@ const Ellipses = () => {
   return (
     <div className="relative">
       <button
-        className="w-5 h-5 rounded-full hover:bg-gray-400"
+        className="h-5 w-5 rounded-full hover:bg-gray-400"
         onClick={() => setActive(!active)}
       >
         <FontAwesomeIcon icon={faEllipsisVertical} size="lg" />

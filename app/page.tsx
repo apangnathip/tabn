@@ -24,7 +24,7 @@ const document = async () => {
 
   return (
     <div className="flex justify-center">
-      <div className="my-4 max-w-5xl grid gap-8 grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="my-4 grid max-w-5xl grid-cols-1 gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         <DocForm />
         {docs &&
           docs?.map((doc: DocCardProps, i: number) => (
