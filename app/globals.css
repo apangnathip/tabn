@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .letter {
-    aspect-ratio: 1 / 1.25;
-  }
-}
-
 /* :root { */
 /*   --foreground-rgb: 0, 0, 0; */
 /*   --background-start-rgb: 214, 219, 220; */
