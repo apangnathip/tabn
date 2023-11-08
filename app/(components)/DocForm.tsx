@@ -23,10 +23,9 @@ const DocForm = () => {
   };
 
   const [docData, setDocData] = useState({ title: "Untitled" });
-
   return (
     <button
-      className="h-80 w-48 rounded border-2 border-black bg-gray-50 text-5xl hover:bg-gray-200 active:bg-blue-100"
+      className="box-content h-80 w-48 rounded-md border-2 border-transparent bg-gray-100 bg-clip-padding text-5xl shadow-[inset_0_0_0_2px_black] hover:border-black active:bg-blue-100"
       onClick={createDoc}
     >
       +
