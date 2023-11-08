@@ -18,7 +18,7 @@ const getDocs = async (): Promise<{ docs: DocType[] } | undefined> => {
   }
 };
 
-const document = async () => {
+const dashboard = async () => {
   const data = await getDocs();
   const docs = data ? data.docs : null;
 
@@ -32,4 +32,4 @@ const document = async () => {
   );
 };
 
-export default document;
+export default dashboard;
