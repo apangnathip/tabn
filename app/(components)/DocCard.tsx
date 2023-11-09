@@ -14,7 +14,14 @@ export const DocCard = ({ doc }: { doc: DocType }) => {
       <div className="absolute bottom-4 left-4 select-none">
         <p className="w-40 truncate text-base font-medium">{doc.title}</p>
         <div className="flex items-center justify-between text-xs ">
-          <span>Updated {doc.updatedAt.toString().slice(0, 10)}</span>
+          <span>
+            Created{" "}
+            {new Date(doc.createdAt).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </span>
           <Ellipses doc={doc} />
         </div>
       </div>

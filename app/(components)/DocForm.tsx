@@ -8,7 +8,9 @@ const DocForm = () => {
   const createDoc = async () => {
     const res = await fetch("../api/Docs", {
       method: "POST",
-      body: JSON.stringify({ docData: { title: "Untitled" } }),
+      body: JSON.stringify({
+        docData: { title: "Untitled", offset: new Date().getTimezoneOffset() },
+      }),
       headers: {
         "Content-Type": "application/json",
       },

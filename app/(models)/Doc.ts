@@ -11,6 +11,7 @@ mongoose.Promise = global.Promise;
 const docSchema = new Schema(
   {
     title: String,
+    offset: Number,
   },
   {
     timestamps: true,
