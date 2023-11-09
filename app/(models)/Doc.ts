@@ -10,16 +10,16 @@ mongoose.Promise = global.Promise;
 
 const docSchema = new Schema(
   {
-    _id: Types.ObjectId,
     title: String,
-    tags: [String],
   },
   {
     timestamps: true,
   },
 );
 
-export type DocType = InferSchemaType<typeof docSchema>;
+export type DocType = InferSchemaType<typeof docSchema> & {
+  _id: Types.ObjectId;
+};
 
 const Doc = mongoose.models.Doc || mongoose.model<DocType>("Doc", docSchema);
 export default Doc;
