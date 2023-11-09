@@ -12,8 +12,8 @@ export const DocCard = ({ doc }: { doc: DocType }) => {
         <div className="h-20 rounded-b bg-gray-300"></div>
       </Link>
       <div className="absolute bottom-4 left-4 select-none">
-        <p className="text-base font-medium">{doc.title}</p>
-        <div className="flex items-center gap-5 text-xs ">
+        <p className="w-40 truncate text-base font-medium">{doc.title}</p>
+        <div className="flex items-center justify-between text-xs ">
           <span>Updated {doc.updatedAt.toString().slice(0, 10)}</span>
           <Ellipses doc={doc} />
         </div>
