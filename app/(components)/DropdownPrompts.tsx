@@ -49,47 +49,50 @@ const DropdownPrompts = ({
   return (
     <>
       <Prompt show={activePrompts.rename}>
-        <span>Rename</span>
-        <input
-          className="px-2 py-1 text-sm"
-          id="rename"
-          type="text"
-          placeholder={doc.title ? doc.title : "Untitled"}
-          onKeyUp={(e) => {
-            const form = e.target as HTMLInputElement;
-            setRenameButton(form.value.length > 0 ? false : true);
+        <div>Rename</div>
+        <form
+          className="flex flex-col gap-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setActivePrompts((prev) => ({ ...prev, rename: false }));
+
+            const input = document.getElementById("rename") as HTMLInputElement;
+            if (input) {
+              const title = input.value;
+              renameDoc(title);
+            }
           }}
-        />
-        <span className="flex justify-end gap-6 text-sm">
-          <button
-            className="rounded bg-gray-300 px-4 py-1 hover:bg-gray-400 active:bg-blue-400"
-            onClick={() => {
-              setActivePrompts((prev) => ({ ...prev, rename: false }));
+        >
+          <input type="submit" hidden />
+          <input
+            className="px-2 py-1 text-sm"
+            id="rename"
+            type="text"
+            placeholder={doc.title ? doc.title : "Untitled"}
+            onKeyUp={(e) => {
+              const form = e.target as HTMLInputElement;
+              setRenameButton(form.value.length > 0 ? false : true);
             }}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="rounded bg-blue-200 px-4 py-1 hover:bg-blue-300 active:bg-blue-400 disabled:bg-blue-200/60"
-            id="rename-submit"
-            disabled={renameButton}
-            onClick={() => {
-              setActivePrompts((prev) => ({ ...prev, rename: false }));
-
-              const input = document.getElementById(
-                "rename",
-              ) as HTMLInputElement;
-
-              if (input) {
-                const title = input.value;
-                renameDoc(title);
-              }
-            }}
-          >
-            OK
-          </button>
-        </span>
+          />
+          <span className="flex justify-end gap-6 text-sm">
+            <button
+              className="rounded bg-gray-300 px-4 py-1 hover:bg-gray-400 active:bg-blue-400"
+              onClick={() => {
+                setActivePrompts((prev) => ({ ...prev, rename: false }));
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="rounded bg-blue-200 px-4 py-1 hover:bg-blue-300 active:bg-blue-400 disabled:bg-blue-200/60"
+              id="rename-submit"
+              disabled={renameButton}
+            >
+              OK
+            </button>
+          </span>
+        </form>
       </Prompt>
 
       <Prompt show={activePrompts.remove}>
