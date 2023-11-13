@@ -29,20 +29,15 @@ const DropdownPrompts = ({
 
   const renameDoc = async (title: string) => {
     const newData = { title: title };
-    const res = await fetch(
-      `http://localhost:3000/api/Docs/${doc._id?.toString()}`,
-      {
-        method: "PUT",
-        body: JSON.stringify({ newData }),
-      },
-    );
+    const res = await fetch(`http://localhost:3000/api/Docs/${doc._id}`, {
+      method: "PUT",
+      body: JSON.stringify({ newData }),
+    });
 
     if (res.ok) {
       router.refresh();
     }
   };
-
-  const [renameButton, setRenameButton] = useState(false);
 
   return (
     <>
