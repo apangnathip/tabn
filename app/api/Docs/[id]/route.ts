@@ -2,6 +2,12 @@ import Doc from "@/app/(models)/Doc";
 import { Types } from "mongoose";
 import { NextResponse } from "next/server";
 
+export async function GET(_: Request, { params }: { params: { id: string } }) {
+  const { id } = params;
+  const doc = await Doc.findById(id);
+  return NextResponse.json(doc, { status: 200 });
+}
+
 export async function DELETE(
   _: Request,
   { params }: { params: { id: Types.ObjectId } },
