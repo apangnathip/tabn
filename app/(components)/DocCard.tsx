@@ -1,8 +1,8 @@
 "use client";
 
-import Ellipses from "./Ellipses";
-import { DocJson } from "../(models)/Doc";
 import Link from "next/link";
+import { DocJson } from "../(models)/Doc";
+import Ellipses from "./Ellipses";
 
 export const DocCard = ({ doc }: { doc: DocJson }) => {
   return (
