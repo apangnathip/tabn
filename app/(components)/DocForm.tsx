@@ -9,7 +9,11 @@ const DocForm = () => {
     const res = await fetch("../api/Docs", {
       method: "POST",
       body: JSON.stringify({
-        docData: { title: "Untitled", offset: new Date().getTimezoneOffset() },
+        docData: {
+          title: "Untitled",
+          offset: new Date().getTimezoneOffset(),
+          notation: "Example blah blah",
+        },
       }),
       headers: {
         "Content-Type": "application/json",
