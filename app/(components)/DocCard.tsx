@@ -1,10 +1,10 @@
 "use client";
 
 import Ellipses from "./Ellipses";
-import { DocType } from "../(models)/Doc";
+import { DocJson } from "../(models)/Doc";
 import Link from "next/link";
 
-export const DocCard = ({ doc }: { doc: DocType }) => {
+export const DocCard = ({ doc }: { doc: DocJson }) => {
   return (
     <div className="relative box-content w-48 rounded-md border-2 border-solid border-transparent hover:border-blue-300">
       <Link href={`document/${doc._id}`} draggable="false">

@@ -2,11 +2,11 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { DocType } from "../(models)/Doc";
+import { DocJson } from "../(models)/Doc";
 import DropdownMenu from "./DropdownMenu";
 import DropdownPrompts from "./DropdownPrompts";
 
-const Ellipses = ({ doc }: { doc: DocType }) => {
+const Ellipses = ({ doc }: { doc: DocJson }) => {
   const [active, setActive] = useState(false);
   const [activePrompts, setActivePrompts] = useState({
     rename: false,

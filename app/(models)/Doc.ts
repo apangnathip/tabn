@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType, Schema, Types } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 if (process.env.MONGODB_URI) {
   mongoose.connect(process.env.MONGODB_URI);
@@ -12,15 +12,21 @@ const docSchema = new Schema(
   {
     title: String,
     offset: Number,
+    notation: String,
   },
   {
     timestamps: true,
   },
 );
 
-export type DocType = InferSchemaType<typeof docSchema> & {
-  _id: Types.ObjectId;
+export type DocJson = {
+  _id: string;
+  createdAt: string;
+  updatedAt: string;
+  title: string;
+  offset: string;
+  notation: string;
 };
 
-const Doc = mongoose.models.Doc || mongoose.model<DocType>("Doc", docSchema);
+const Doc = mongoose.models.Doc || mongoose.model("Doc", docSchema);
 export default Doc;

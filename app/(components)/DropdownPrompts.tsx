@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { DocType } from "../(models)/Doc";
+import { DocJson } from "../(models)/Doc";
 import Prompt from "./Prompt";
 
 const DropdownPrompts = ({
@@ -8,21 +8,19 @@ const DropdownPrompts = ({
   activePrompts,
   setActivePrompts,
 }: {
-  doc: DocType;
+  doc: DocJson;
   activePrompts: { rename: boolean; remove: boolean };
   setActivePrompts: React.Dispatch<
     React.SetStateAction<{ rename: boolean; remove: boolean }>
   >;
 }) => {
+  const [renameButton, setRenameButton] = useState(false);
   const router = useRouter();
 
   const deleteDoc = async () => {
-    const res = await fetch(
-      `http://localhost:3000/api/Docs/${doc._id?.toString()}`,
-      {
-        method: "DELETE",
-      },
-    );
+    const res = await fetch(`http://localhost:3000/api/Docs/${doc._id}`, {
+      method: "DELETE",
+    });
 
     if (res.ok) {
       router.refresh();

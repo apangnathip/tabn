@@ -1,8 +1,8 @@
 import { DocCard } from "./(components)/DocCard";
 import DocForm from "./(components)/DocForm";
-import { DocType } from "./(models)/Doc";
+import { DocJson } from "./(models)/Doc";
 
-const getDocs = async (): Promise<{ docs: DocType[] } | undefined> => {
+const getDocs = async (): Promise<{ docs: DocJson[] } | undefined> => {
   try {
     const res = await fetch("http://localhost:3000/api/Docs", {
       cache: "no-store",
