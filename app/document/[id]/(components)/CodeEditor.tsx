@@ -25,7 +25,7 @@ const CodeEditor = ({
 
   return (
     <Editor
-      height="50vh"
+      height="40vh"
       width="100%"
       theme="vs-dark"
       defaultLanguage="xml"
