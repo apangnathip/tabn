@@ -2,6 +2,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { DocJson } from "../(models)/Doc";
 import Prompt from "./Prompt";
+import { deleteDoc, renameDoc } from "../(utils)/docFunctions";
 
 const DropdownPrompts = ({
   doc,
@@ -17,28 +18,6 @@ const DropdownPrompts = ({
   const [renameButton, setRenameButton] = useState(false);
   const router = useRouter();
 
-  const deleteDoc = async () => {
-    const res = await fetch(`http://localhost:3000/api/Docs/${doc._id}`, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
-      router.refresh();
-    }
-  };
-
-  const renameDoc = async (title: string) => {
-    const newData = { title: title };
-    const res = await fetch(`http://localhost:3000/api/Docs/${doc._id}`, {
-      method: "PUT",
-      body: JSON.stringify({ newData }),
-    });
-
-    if (res.ok) {
-      router.refresh();
-    }
-  };
-
   return (
     <>
       <Prompt show={activePrompts.rename}>
@@ -52,7 +31,7 @@ const DropdownPrompts = ({
             const input = document.getElementById("rename") as HTMLInputElement;
             if (input) {
               const title = input.value;
-              renameDoc(title);
+              renameDoc(title, router, doc._id);
             }
           }}
         >
@@ -104,7 +83,7 @@ const DropdownPrompts = ({
             className="rounded bg-blue-200 px-4 py-1 hover:bg-blue-300 active:bg-blue-400"
             onClick={() => {
               setActivePrompts((prev) => ({ ...prev, remove: false }));
-              deleteDoc();
+              deleteDoc(router, doc._id);
             }}
           >
             OK
