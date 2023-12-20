@@ -1,14 +1,20 @@
 "use client";
 
-import Sheet from "@/app/(components)/Sheet";
 import { DocJson } from "@/app/(models)/Doc";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import CodeEditor from "./(components)/CodeEditor";
+import Sheet from "./(components)/Sheet";
+import { renameDoc } from "@/app/(utils)/docFunctions";
+import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMusic } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 const Document = ({ doc }: { doc: DocJson }) => {
   const [tab, setTab] = useState(doc.notation);
   const [lastSaved, setLastSaved] = useState(doc.notation);
   const SAVE_INTERVAL = 5000;
+  const router = useRouter();
 
   const saveDocument = async (notation: string) => {
     if (tab === lastSaved) return;
@@ -26,6 +32,14 @@ const Document = ({ doc }: { doc: DocJson }) => {
     setLastSaved(notation);
   };
 
+  const handleTitleChange = (e: FormEvent) => {
+    const newTitle = e.currentTarget.textContent;
+    if (newTitle === doc.title) return;
+    if (newTitle) {
+      renameDoc(newTitle, router, doc._id);
+    }
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       saveDocument(tab);
@@ -34,10 +48,27 @@ const Document = ({ doc }: { doc: DocJson }) => {
   });
 
   return (
-    <div className="m-4 grid gap-4">
+    <>
+      <div className="flex items-center gap-2 p-2 text-lg">
+        <Link className="rounded-full" href="/">
+          <FontAwesomeIcon
+            className="rounded-full p-3 hover:bg-gray-300"
+            icon={faMusic}
+            size="xl"
+          />
+        </Link>
+        <span
+          suppressContentEditableWarning
+          contentEditable
+          className="rounded border border-transparent px-2 hover:border-black"
+          onBlur={handleTitleChange}
+        >
+          {doc.title}
+        </span>
+      </div>
       <CodeEditor doc={doc} setTab={setTab} />
-      <Sheet tab={tab} />
-    </div>
+      <Sheet title={doc.title} tab={tab} />
+    </>
   );
 };
 
