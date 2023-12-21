@@ -1,25 +1,38 @@
 import {
+  Accidental,
   Font,
   FontStyle,
   FontWeight,
+  Formatter,
+  KeyManager,
   RenderContext,
   Renderer,
   Stave,
-  StaveConnector,
+  StaveNote,
+  TabNote,
   TabStave,
   TextFormatter,
+  Tuning,
 } from "vexflow";
 
-const option = ["notation", "tablature", "clef", "key", "time"] as const;
+const option = [
+  "staveType",
+  "notation",
+  "tablature",
+  "clef",
+  "key",
+  "time",
+] as const;
 type Option = (typeof option)[number];
 
 type Options = {
   [prop in Option]: any;
 };
 
-type StaveType = "tab" | "note";
-
 const isOption = (x: any): x is Option => option.includes(x);
+
+type StavePair = [TabStave | null, Stave | null];
+type GenericNote = { note: string; place: string };
 
 export class Compiler {
   div: HTMLDivElement;
@@ -28,6 +41,7 @@ export class Compiler {
   margin: number;
   staveWidth: number;
   currPos: number;
+  tuning: Tuning;
 
   constructor(ref: HTMLDivElement) {
     this.div = ref;
@@ -37,41 +51,7 @@ export class Compiler {
     this.margin = 50;
     this.staveWidth = ref.offsetWidth - this.margin * 2;
     this.currPos = 0;
-  }
-
-  parse(notation: string) {
-    if (this.div.childNodes.length > 1 && this.div.firstChild) {
-      this.div.removeChild(this.div.firstChild);
-    }
-
-    const lines = notation.split(/\r?\n/);
-    let currStaves: (Stave | null)[];
-
-    for (const line of lines) {
-      if (line[0] === "#") continue;
-
-      const spaceIndex = line.indexOf(" ");
-      const keyword = line.substring(0, spaceIndex);
-      const rest = line.substring(spaceIndex + 1);
-
-      try {
-        switch (keyword) {
-          case "stave":
-            currStaves = this.parseStave(rest, "note");
-            this.drawStaves(currStaves);
-            break;
-          case "tabstave":
-            currStaves = this.parseStave(rest, "tab");
-            this.drawStaves(currStaves);
-            break;
-          case "notes":
-            this.parseNotes(rest);
-            break;
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
+    this.tuning = new Tuning();
   }
 
   setTitle(title: string) {
@@ -96,7 +76,13 @@ export class Compiler {
   }
 
   getOpts(optString: string) {
-    let opts = {} as Options;
+    let opts = {
+      notation: false,
+      tablature: true,
+      clef: "treble",
+      key: "C",
+      time: "C",
+    } as Options;
 
     optString.split(/\s/).forEach((pair) => {
       const [prop, value] = pair.split("=");
@@ -104,6 +90,10 @@ export class Compiler {
         opts[prop] = value;
       }
     });
+
+    if (!/(C|C\||[0-9]+\/[0-9]+)/.test(opts.time)) {
+      throw new Error("Invalid time signature");
+    }
 
     return opts;
   }
@@ -115,19 +105,173 @@ export class Compiler {
     this.currPos += stave.getBoundingBox().h;
   }
 
-  parseStave(line: string, type: StaveType, globalOpts = null) {
-    const opts = globalOpts ?? this.getOpts(line);
-    let tabstave = null;
-    let notestave = null;
+  createStaveNote(
+    note: string,
+    place: string,
+    opts: Options,
+    keyManager: KeyManager,
+  ) {
+    let staveNote;
 
-    if (type === "tab" || opts.tablature === "true") {
+    if (/^[A-G]+[#bn]?$/.test(note)) {
+      staveNote = new StaveNote({
+        keys: [`${note}/${place}`],
+        duration: "q",
+      });
+
+      if (note.length === 2) {
+        staveNote.addModifier(new Accidental(note[1]));
+      }
+    } else {
+      const [absNote, octave] = this.tuning
+        .getNoteForFret(note, place)
+        .split("/");
+      const keyNote = keyManager.selectNote(absNote);
+
+      staveNote = new StaveNote({
+        keys: [`${keyNote.note}/${octave}`],
+        duration: "q",
+        clef: opts.clef,
+        auto_stem: true,
+      });
+
+      if (keyNote.accidental) {
+        staveNote.addModifier(new Accidental(keyNote.accidental));
+      }
+    }
+
+    return staveNote;
+  }
+
+  createTabNote(note: string, place: string) {
+    const tabNote = new TabNote({
+      positions: [
+        {
+          str: parseInt(place),
+          fret: /^[0-9]+$/.test(note) ? note : "x",
+        },
+      ],
+      duration: "q",
+    });
+
+    return tabNote;
+  }
+
+  createNoteObjects(
+    notes: GenericNote[],
+    opts: Options,
+    override?: "stave" | "tabstave",
+  ) {
+    const noteObjects: TabNote[] & StaveNote[] = [];
+
+    if ((!override && opts.staveType === "stave") || override === "stave") {
+      const keyManager = new KeyManager(opts.key);
+      for (const note of notes) {
+        noteObjects.push(
+          this.createStaveNote(note.note, note.place, opts, keyManager),
+        );
+      }
+    } else if (
+      (!override && opts.staveType === "tabstave") ||
+      override === "tabstave"
+    ) {
+      for (const note of notes) {
+        noteObjects.push(this.createTabNote(note.note, note.place));
+      }
+    }
+
+    return noteObjects;
+  }
+
+  drawNotesOnStave(
+    notes: GenericNote[],
+    stave: Stave | TabStave,
+    opts: Options,
+  ) {
+    const noteObjects = this.createNoteObjects(notes, opts);
+    Formatter.FormatAndDraw(this.ctx, stave, noteObjects);
+  }
+
+  drawNotesOnStavePair(
+    notes: GenericNote[],
+    tabstave: TabStave,
+    stave: Stave,
+    opts: Options,
+  ) {
+    const tabNoteObjects = this.createNoteObjects(notes, opts, "tabstave");
+    const noteObjects = this.createNoteObjects(notes, opts, "stave");
+    tabstave.setNoteStartX(stave.getNoteStartX());
+
+    Formatter.FormatAndDrawTab(
+      this.ctx,
+      tabstave,
+      stave,
+      tabNoteObjects,
+      noteObjects,
+      true,
+      {},
+    );
+  }
+
+  parse(notation: string) {
+    if (this.div.childNodes.length > 1 && this.div.firstChild) {
+      this.div.removeChild(this.div.firstChild);
+    }
+
+    const lines = notation.split(/\r?\n/);
+    let tabstave = null;
+    let keystave = null;
+    let opts = {} as Options;
+    let notes;
+
+    for (const line of lines) {
+      if (line[0] === "#") continue;
+
+      const spaceIndex = line.indexOf(" ");
+      const rest = line.substring(spaceIndex + 1).trim();
+      let keyword;
+
+      if (spaceIndex === -1) {
+        keyword = line;
+      } else {
+        keyword = line.substring(0, spaceIndex);
+      }
+
+      try {
+        if (keyword === "stave" || keyword === "tabstave") {
+          opts = this.getOpts(rest);
+          opts.staveType = keyword;
+          [tabstave, keystave] = this.parseStave(opts);
+          keystave && keystave.draw();
+          tabstave && tabstave.draw();
+        } else if (keyword === "notes") {
+          notes = this.parseNotes(rest);
+          if (tabstave && keystave) {
+            this.drawNotesOnStavePair(notes, tabstave, keystave, opts);
+          } else if (tabstave) {
+            this.drawNotesOnStave(notes, tabstave, opts);
+          } else if (keystave) {
+            this.drawNotesOnStave(notes, keystave, opts);
+          }
+        }
+      } catch (e) {
+        console.log((e as Error).message);
+      }
+    }
+  }
+
+  parseStave(opts: Options): StavePair {
+    let tabstave: TabStave | null = null;
+    let keystave: Stave | null = null;
+
+    if (opts.staveType === "tabstave" || opts.tablature === "true") {
       tabstave = new TabStave(this.margin, 0, this.staveWidth).addClef("tab");
     }
 
-    if (type === "note" || opts.notation === "true") {
-      notestave = new Stave(this.margin, 0, this.staveWidth);
+    if (opts.staveType === "stave" || opts.notation === "true") {
+      keystave = new Stave(this.margin, 0, this.staveWidth);
       try {
-        notestave
+        keystave
           .addClef(opts.clef)
           .addKeySignature(opts.key)
           .addTimeSignature(opts.time);
@@ -136,31 +280,59 @@ export class Compiler {
       }
     }
 
-    if (notestave && tabstave) {
-      this.setStavePos(notestave);
+    if (keystave && tabstave) {
+      this.setStavePos(keystave);
       this.currPos -= 50;
       this.setStavePos(tabstave);
-
-      const connector = new StaveConnector(notestave, tabstave);
-      connector.setType(StaveConnector.type.SINGLE);
-      connector.setContext(this.ctx);
-      connector.draw();
-    } else if (notestave) {
-      this.setStavePos(notestave);
+    } else if (keystave) {
+      this.setStavePos(keystave);
     } else if (tabstave) {
       this.setStavePos(tabstave);
     }
 
-    return [notestave, tabstave];
-  }
-
-  drawStaves(staves: (Stave | null)[]) {
-    for (const stave of staves) {
-      stave?.draw();
-    }
+    return [tabstave, keystave];
   }
 
   parseNotes(line: string) {
-    console.log(line);
+    const tokens = line.split(" ");
+    const notes = [];
+
+    for (const token of tokens) {
+      switch (token[0]) {
+        case "(":
+          break;
+        case "#":
+          break;
+        case ":":
+          break;
+        case "^":
+          break;
+        case "|":
+          break;
+        default:
+          notes.push(...this.parsePlainNotes(token));
+      }
+    }
+
+    return notes;
+  }
+
+  parsePlainNotes(token: string): GenericNote[] {
+    const [neighbourNotes, place] = token.split("/");
+    const tiedNotes = neighbourNotes.split("-");
+    const notes = [];
+
+    for (const tiedNote of tiedNotes) {
+      const pureNotes = tiedNote.split(/[hbpts]/);
+
+      for (const pureNote of pureNotes) {
+        notes.push({
+          note: pureNote,
+          place: place,
+        });
+      }
+    }
+
+    return notes;
   }
 }
